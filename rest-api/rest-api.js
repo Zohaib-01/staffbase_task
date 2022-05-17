@@ -42,26 +42,6 @@ export class RestAPI {
 
       //iterating over the users in DB
       for (let user of this.db) {
-        //Checking borrowser user in DB
-        if (user.name == borrower) {
-          let borrower = user;
-          if (borrower.owed_by[lender]) {
-            const difference = borrower.owed_by[lender] - amount;
-            if (difference < 0) {
-              delete borrower.owed_by[lender];
-              borrower.owes[lender] = -difference;
-            } else if (difference > 0) {
-              borrower.owed_by[lender] -= amount;
-            } else {
-              delete borrower.owed_by[lender];
-            }
-          } else {
-            borrower.owes[lender] = (borrower.owes[lender] || 0) + amount;
-          }
-          borrower.balance -= amount;
-          response.users.push(borrower);
-        }
-
         //Checking lender user in DB
         if (user.name == lender) {
           let lender = user;
@@ -80,6 +60,25 @@ export class RestAPI {
           }
           lender.balance += amount;
           response.users.push(lender);
+        }
+        //Checking borrowser user in DB
+        if (user.name == borrower) {
+          let borrower = user;
+          if (borrower.owed_by[lender]) {
+            const difference = borrower.owed_by[lender] - amount;
+            if (difference < 0) {
+              delete borrower.owed_by[lender];
+              borrower.owes[lender] = -difference;
+            } else if (difference > 0) {
+              borrower.owed_by[lender] -= amount;
+            } else {
+              delete borrower.owed_by[lender];
+            }
+          } else {
+            borrower.owes[lender] = (borrower.owes[lender] || 0) + amount;
+          }
+          borrower.balance -= amount;
+          response.users.push(borrower);
         }
       }
       return response;
